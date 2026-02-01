@@ -27,6 +27,7 @@ jobs:
 
       - name: Test with Pytest
         run: |
+          export PYTHONPATH=gateway-repo/app
           pytest --cov=. --cov-report=xml:coverage.xml
 
       - name: SonarCloud Scan
