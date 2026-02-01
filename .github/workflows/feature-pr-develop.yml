@@ -35,12 +35,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          # Additional arguments for the SonarScanner
-          args: >
-            -Dsonar.projectKey=fiapx-app-api
-            -Dsonar.organization=hackathom-fiap
-            -Dsonar.python.coverage.reportPaths=coverage.xml
 
   create_pull_request:
     runs-on: ubuntu-latest
