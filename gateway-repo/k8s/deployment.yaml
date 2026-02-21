@@ -16,7 +16,7 @@ spec:
       serviceAccountName: api-service-account
       containers:
       - name: gateway
-        image: 239409137076.dkr.ecr.us-east-1.amazonaws.com/api:2d57c66143b559626d4db742c9d27543d09bd3b3
+        image: 239409137076.dkr.ecr.us-east-1.amazonaws.com/api:latest
         imagePullPolicy: IfNotPresent
         env:
         - name: DB_HOST
@@ -59,9 +59,19 @@ spec:
             secretKeyRef:
               name: redis-credentials
               key: password
+        
+        - name: S3_BUCKET_NAME
+          value: "fiapx-video"
 
         - name: SECRET_KEY
           value: "a_very_secret_key_for_local_dev"
+        
+        - name: NEW_RELIC_APP_NAME
+          value: "fiapx-api"
+        - name: NEW_RELIC_LICENSE_KEY
+          value: "3b37ab2f3df2e57df99ba57f8e851b7dFFFFNRAL"
+        - name: NEW_RELIC_LOG_LEVEL
+          value: "info"
         ports:
         - containerPort: 8000
         resources:

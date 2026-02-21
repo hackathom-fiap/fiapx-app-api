@@ -65,7 +65,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Dependency Injection Setup
 RABBITMQ_URL = os.getenv("RABBITMQ_URL", "amqp://user:password@rabbitmq:5672/")
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
+
+# Obtém as variáveis de ambiente individuais do Redis
+REDIS_USER = os.getenv("REDIS_USER", "default")
+REDIS_PASSWORD = os.getenv("REDIS_PASSWORD", "password")
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = os.getenv("REDIS_PORT", "6379")
+
+# Constrói a URL de conexão do Redis (rediss:// para SSL/Transit Encryption)
+REDIS_URL = f"rediss://{REDIS_USER}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0"
+
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 
 class UserCreate(BaseModel):
