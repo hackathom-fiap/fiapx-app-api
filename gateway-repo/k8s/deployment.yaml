@@ -16,7 +16,7 @@ spec:
       serviceAccountName: api-service-account
       containers:
       - name: gateway
-        image: fiapx-gateway:latest
+        image: 239409137076.dkr.ecr.us-east-1.amazonaws.com/api:2d57c66143b559626d4db742c9d27543d09bd3b3
         imagePullPolicy: IfNotPresent
         env:
         - name: DB_HOST
@@ -41,10 +41,7 @@ spec:
         - name: MQ_PORT
           value: "5671" # <POPULATE_FROM_TERRAFORM_OUTPUT: broker_endpoint (port part)>
         - name: MQ_USER
-          valueFrom:
-            secretKeyRef:
-              name: rabbitmq-credentials
-              key: username
+          value: "user"
         - name: MQ_PASSWORD
           valueFrom:
             secretKeyRef:
