@@ -64,7 +64,18 @@ def metrics():
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Dependency Injection Setup
-RABBITMQ_URL = os.getenv("RABBITMQ_URL", "amqp://user:password@rabbitmq:5672/")
+MQ_USER = os.getenv("MQ_USER")
+MQ_PASSWORD = os.getenv("MQ_PASSWORD")
+MQ_HOST = os.getenv("MQ_HOST")
+MQ_PORT = os.getenv("MQ_PORT", "5671") # Default to 5671 for Amazon MQ with TLS
+
+if not all([MQ_USER, MQ_PASSWORD, MQ_HOST]):
+    # Fallback to a default or raise an error if critical MQ vars are missing
+    # For now, let's use a default for development if not running in K8s
+    # In a production K8s environment, these should always be provided.
+    RABBITMQ_URL = "amqps://user:password@rabbitmq:5671/" # Using amqps for consistency
+else:
+    RABBITMQ_URL = f"amqps://{MQ_USER}:{MQ_PASSWORD}@{MQ_HOST}:{MQ_PORT}/"
 
 # Obtém as variáveis de ambiente individuais do Redis
 REDIS_USER = os.getenv("REDIS_USER", "default")
