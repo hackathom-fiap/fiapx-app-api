@@ -1,4 +1,4 @@
-name: '[PRD] Build, Test and Deploy Python App to EKS'
+name: '[PRD] Build, Test and Deploy App to EKS'
 
 on:
   push:
