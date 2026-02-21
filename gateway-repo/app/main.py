@@ -14,11 +14,12 @@ from starlette.responses import Response
 # Import layers
 import models
 import auth
+import boto3 # Import boto3
 from database import engine, get_db
 from src.domain.entities import User as UserEntity
 from src.adapters.db.repositories import PostgresUserRepository, PostgresVideoRepository
 from src.adapters.messaging.producer import RabbitMQProducer
-from src.adapters.storage import LocalFileStorage
+from src.adapters.storage import S3FileStorage
 from src.adapters.cache.redis_cache import RedisVideoCache
 from src.use_cases.register_user import RegisterUserUseCase
 from src.use_cases.upload_video import UploadVideoUseCase
@@ -63,9 +64,9 @@ def metrics():
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Dependency Injection Setup
-SHARED_DIR = os.getenv("SHARED_DIR", "/data")
 RABBITMQ_URL = os.getenv("RABBITMQ_URL", "amqp://user:password@rabbitmq:5672/")
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
+S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 
 class UserCreate(BaseModel):
     username: str
@@ -135,7 +136,7 @@ async def upload_video(
 ):
     video_repo = PostgresVideoRepository(db)
     broker = RabbitMQProducer(RABBITMQ_URL, "video_processing")
-    storage = LocalFileStorage(SHARED_DIR)
+    storage = S3FileStorage(S3_BUCKET_NAME)
     
     use_case = UploadVideoUseCase(video_repo, broker, storage)
     
@@ -157,15 +158,34 @@ def get_status(current_user: UserEntity = Depends(get_current_user_entity), db: 
     if not videos:
         return {"message": "Não há vídeos para download."}
     
-    return [
-        {
+    s3_client = boto3.client('s3')
+    response_data = []
+    
+    for v in videos:
+        presigned_url = None
+        if v.zip_path:
+            try:
+                # Extract key from S3 URL: https://bucket.s3.amazonaws.com/key
+                # Simple split by bucket name to get the key
+                key = v.zip_path.split(f"https://{S3_BUCKET_NAME}.s3.amazonaws.com/")[-1]
+                if key:
+                    presigned_url = s3_client.generate_presigned_url(
+                        'get_object',
+                        Params={'Bucket': S3_BUCKET_NAME, 'Key': key},
+                        ExpiresIn=3600 # URL valid for 1 hour
+                    )
+            except Exception as e:
+                print(f"Error generating presigned URL: {e}")
+                
+        response_data.append({
             "id": v.id,
             "original_name": v.original_name,
             "status": v.status,
             "created_at": v.created_at,
-            "zip_url": f"/download/{v.zip_path}" if v.zip_path else None
-        } for v in videos
-    ]
+            "zip_url": presigned_url
+        })
+    
+    return response_data
 
 @app.get("/users", response_model=List[UserResponse])
 def list_users(db: Session = Depends(get_db), current_user: UserEntity = Depends(get_current_user_entity)):
