@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-deployment
+  namespace: fiapx-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      serviceAccountName: api-service-account
+      containers:
+      - name: gateway
+        image: fiapx-gateway:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DB_HOST
+          value: "soat-postgres-db.cszqygoyua1z.us-east-1.rds.amazonaws.com" # <POPULATE_FROM_TERRAFORM_OUTPUT: db_instance_endpoint (hostname part)>
+        - name: DB_PORT
+          value: "5432" # <POPULATE_FROM_TERRAFORM_OUTPUT: db_instance_endpoint (port part)>
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: password
+
+        - name: MQ_HOST
+          value: "b-da477231-97db-4dbc-8473-2ec479ea9dcb.mq.us-east-1.on.aws" # <POPULATE_FROM_TERRAFORM_OUTPUT: broker_endpoint (hostname part)>
+        - name: MQ_PORT
+          value: "5671" # <POPULATE_FROM_TERRAFORM_OUTPUT: broker_endpoint (port part)>
+        - name: MQ_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-credentials
+              key: username
+        - name: MQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-credentials
+              key: password
+
+        - name: REDIS_HOST
+          value: "master.fiapx-redis-replication-group.jx4c0w.use1.cache.amazonaws.com" # <POPULATE_FROM_TERRAFORM_OUTPUT: redis_endpoint>
+        - name: REDIS_PORT
+          value: "6379" # <POPULATE_FROM_TERRAFORM_OUTPUT: redis_port>
+        - name: REDIS_USER
+          value: "default"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis-credentials
+              key: password
+
+        - name: SECRET_KEY
+          value: "a_very_secret_key_for_local_dev"
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
