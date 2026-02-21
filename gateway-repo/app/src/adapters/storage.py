@@ -1,5 +1,6 @@
 import shutil
 import os
+import boto3
 from src.ports.interfaces import FileStorage
 
 class LocalFileStorage(FileStorage):
@@ -12,3 +13,15 @@ class LocalFileStorage(FileStorage):
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file_obj, buffer)
         return file_path
+
+class S3FileStorage(FileStorage):
+    def __init__(self, bucket_name: str):
+        self.s3_client = boto3.client('s3')
+        self.bucket_name = bucket_name
+
+    def save(self, file_obj, filename: str) -> str:
+        s3_key = f"uploads/{filename}"
+        print(f"Uploading file to S3: {self.bucket_name}/{s3_key}")
+        # Use upload_fileobj for efficient memory usage with large files
+        self.s3_client.upload_fileobj(file_obj, self.bucket_name, s3_key)
+        return f"s3://{self.bucket_name}/{s3_key}"
