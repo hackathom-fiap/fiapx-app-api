@@ -16,7 +16,7 @@ spec:
       serviceAccountName: api-service-account
       containers:
       - name: gateway
-        image: 239409137076.dkr.ecr.us-east-1.amazonaws.com/api:2d57c66143b559626d4db742c9d27543d09bd3b3
+        image: 239409137076.dkr.ecr.us-east-1.amazonaws.com/api:latest
         imagePullPolicy: IfNotPresent
         env:
         - name: DB_HOST
