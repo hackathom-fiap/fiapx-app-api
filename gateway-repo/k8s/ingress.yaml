@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-gateway-ingress
+  namespace: fiapx-api
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false" # Set to "true" if TLS is configured
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false" # Set to "true" if TLS is configured
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: api.fiapx.com # Substitua pelo seu hostname
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gateway-service
+            port:
+              number: 8000
+  # tls: # Descomente e configure se quiser HTTPS
+  # - hosts:
+  #   - api.fiapx.com # Substitua pelo seu hostname
+  #   secretName: api-tls-secret # Crie este Secret com seu certificado TLS
