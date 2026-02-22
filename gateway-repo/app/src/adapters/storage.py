@@ -1,6 +1,7 @@
 import shutil
 import os
 import boto3
+from boto3.session import Config # Add this import
 from src.ports.interfaces import FileStorage
 
 class LocalFileStorage(FileStorage):
@@ -16,7 +17,7 @@ class LocalFileStorage(FileStorage):
 
 class S3FileStorage(FileStorage):
     def __init__(self, bucket_name: str):
-        self.s3_client = boto3.client('s3')
+        self.s3_client = boto3.client('s3', config=Config(use_ssl=True))
         self.bucket_name = bucket_name
 
     def save(self, file_obj, filename: str) -> str:
