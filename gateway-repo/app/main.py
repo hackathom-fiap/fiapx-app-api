@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 import os
+from urllib.parse import quote_plus
 from datetime import timedelta
 from typing import List
 import time
@@ -84,7 +85,8 @@ REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = os.getenv("REDIS_PORT", "6379")
 
 # Constrói a URL de conexão do Redis (rediss:// para SSL/Transit Encryption)
-REDIS_URL = f"rediss://{REDIS_USER}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0"
+encoded_redis_password = quote_plus(REDIS_PASSWORD)
+REDIS_URL = f"rediss://{REDIS_USER}:{encoded_redis_password}@{REDIS_HOST}:{REDIS_PORT}/0"
 
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 
