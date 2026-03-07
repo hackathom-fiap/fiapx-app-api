@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:postgres-video-postgresql.hackathon-db.svc.cluster.local}:5432/video_db
+    username: ${DB_USER:video_admin}
+    password: ${DB_PASSWORD:video_password123}
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 200MB
+  jpa:
+    hibernate:
+      ddl-auto: update
+  rabbitmq:
+    host: ${RABBIT_HOST:rabbitmq.hackathon-mq.svc.cluster.local}
+    port: 5672
+    username: ${RABBIT_USER:admin}
+    password: ${RABBIT_PASSWORD:admin123}
+
+server:
+  port: 8082
+
+jwt:
+  secret: ${JWT_SECRET:hackathon-secret-key-fiap-x-soat11-java}
