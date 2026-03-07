@@ -47,7 +47,7 @@ jobs:
         run: |
           POM_FILE=$(find . -name "pom.xml" -not -path "*/target/*" -maxdepth 2 | head -n 1)
           if [ -z "$POM_FILE" ]; then echo "pom.xml not found"; exit 1; fi
-          mvn -f "$POM_FILE" -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=TechFiap_soat-tech-challenge4-app-customer
+          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=hackathom-fiap_fiapx-app-api
 
 
   build:
@@ -150,7 +150,7 @@ jobs:
           NEW_TAG: ${{ needs.build.outputs.tag }}
         run: |
          
-          sed -i "s/TAG/$NEW_TAG/g" infra/deployment.yml
+          sed -i "s/TAG/$NEW_TAG/g" k8s/deployment.yaml
 
       - name: Verificar valor da variavel imagem 
         run: |
@@ -158,7 +158,7 @@ jobs:
 
       - name: Fazer deploy da aplicação no EKS
         run: |
-          kubectl apply -f infra/namespace.yml
-          kubectl apply --validate=false -f infra
+          kubectl apply -f k8s/namespace.yaml
+          kubectl apply --validate=false -f k8s
           
           echo "Deploy realizado com sucesso!"
