@@ -65,22 +65,22 @@ graph TD
     Auth -->|Valida/Cria Usuário| DB
     Auth -->|Gerencia Sessão| Cache
 
-    API -.->|Verifica Token JWT| Auth
-    API -->|Salva Metadados/Status| DB
-    API -->|Upload do Vídeo Bruto| Storage
-    API -->|Publica Evento (Pendente)| MQ
+    API -.->|"Verifica Token JWT"| Auth
+    API -->|"Salva Metadados/Status"| DB
+    API -->|"Upload do Vídeo Bruto"| Storage
+    API -->|"Publica Evento (Pendente)"| MQ
 
-    MQ -->|Consome Evento| Worker
-    Worker -->|Lê Vídeo Bruto| Storage
-    Worker -->|Processa e Salva ZIP| Storage
-    Worker -->|Atualiza Status (Concluído)| DB
+    MQ -->|"Consome Evento"| Worker
+    Worker -->|"Lê Vídeo Bruto"| Storage
+    Worker -->|"Processa e Salva ZIP"| Storage
+    Worker -->|"Atualiza Status (Concluído)"| DB
 
     %% Relacionamentos CI/CD
-    GH -.->|Analisa Código| Sonar
-    GH -.->|Gera Imagem Docker| ECR
-    GH -.->|Deploy (kubectl apply)| Auth
-    GH -.->|Deploy (kubectl apply)| API
-    GH -.->|Deploy (kubectl apply)| Worker
+    GH -.->|"Analisa Código"| Sonar
+    GH -.->|"Gera Imagem Docker"| ECR
+    GH -.->|"Deploy (kubectl apply)"| Auth
+    GH -.->|"Deploy (kubectl apply)"| API
+    GH -.->|"Deploy (kubectl apply)"| Worker
 ```
 
 ### Camada de Entrada e Roteamento
