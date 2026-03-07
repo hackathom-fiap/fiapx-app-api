@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: video-api-config
+  namespace: hackathon-video-api
+data:
+  DB_HOST: "postgres-postgresql.hackathon-db.svc.cluster.local"
+  DB_USER: "admin"
+  RABBIT_HOST: "rabbitmq.hackathon-mq.svc.cluster.local"
+  RABBIT_USER: "admin"
