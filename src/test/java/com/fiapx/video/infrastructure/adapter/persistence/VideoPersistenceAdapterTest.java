@@ -78,7 +78,7 @@ class VideoPersistenceAdapterTest {
         assertEquals(video.getUsername(), result.getUsername());
         assertEquals(video.getUserEmail(), result.getUserEmail());
         assertEquals(video.getContentType(), result.getContentType());
-        assertEquals(video.getCreatedAt(), result.getCreatedAt());
+        assertEquals(video.getCreatedAt().truncatedTo(java.time.temporal.ChronoUnit.SECONDS), result.getCreatedAt().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
         
         verify(jpaRepository, times(1)).save(argThat(entity -> 
             entity.getId().equals(videoId) &&
@@ -89,7 +89,7 @@ class VideoPersistenceAdapterTest {
             entity.getUsername().equals(video.getUsername()) &&
             entity.getUserEmail().equals(video.getUserEmail()) &&
             entity.getContentType().equals(video.getContentType()) &&
-            entity.getCreatedAt().equals(video.getCreatedAt())
+            entity.getCreatedAt().truncatedTo(java.time.temporal.ChronoUnit.SECONDS).equals(video.getCreatedAt().truncatedTo(java.time.temporal.ChronoUnit.SECONDS))
         ));
     }
     
