@@ -13,9 +13,10 @@ spec:
       labels:
         app: video-api
     spec:
+      serviceAccountName: api-service-account # Para o pod usar a Role do S3
       containers:
       - name: video-api
-        image: fiap-x-video-api:latest
+        image: 239409137076.dkr.ecr.us-east-1.amazonaws.com/api:TAG
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8082
@@ -24,10 +25,10 @@ spec:
             name: video-api-config
         - secretRef:
             name: video-api-secret
-        volumeMounts:
-        - name: video-storage
-          mountPath: /tmp/videos
-      volumes:
-      - name: video-storage
-        persistentVolumeClaim:
-          claimName: video-shared-pvc
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
