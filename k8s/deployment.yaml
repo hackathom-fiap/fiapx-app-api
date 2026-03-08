@@ -24,10 +24,10 @@ spec:
             name: video-api-config
         - secretRef:
             name: video-api-secret
-        resources:
-          requests:
-            cpu: "10m"
-            memory: "256Mi"
-          limits:
-            cpu: "200m"
-            memory: "256Mi"
+        volumeMounts:
+        - name: video-storage
+          mountPath: /tmp/videos
+      volumes:
+      - name: video-storage
+        persistentVolumeClaim:
+          claimName: video-shared-pvc

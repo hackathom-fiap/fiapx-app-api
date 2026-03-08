@@ -7,6 +7,8 @@ import com.fiapx.video.domain.service.MessageBrokerPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
@@ -31,13 +33,28 @@ public class UploadVideoUseCase {
         // 2. Salvar no Banco
         Video savedVideo = videoRepository.save(video);
 
-        // 3. Simular salvamento de arquivo (Em produção seria S3/MinIO)
+        // 3. Salvamento de arquivo REAL no disco compartilhado
         String extension = "";
         String fileName = request.getFile().getOriginalFilename();
         if (fileName != null && fileName.contains(".")) {
             extension = fileName.substring(fileName.lastIndexOf("."));
         }
-        savedVideo.setStoragePath("/tmp/videos/" + savedVideo.getId() + extension);
+        
+        String path = "/tmp/videos/" + savedVideo.getId() + extension;
+        File dest = new File(path);
+        
+        // Garantir que o diretório pai existe
+        if (!dest.getParentFile().exists()) {
+            dest.getParentFile().mkdirs();
+        }
+
+        try {
+            // Salva o arquivo fisicamente no disco compartilhado
+            request.getFile().transferTo(dest);
+            savedVideo.setStoragePath(path);
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao salvar arquivo de vídeo no disco", e);
+        }
 
         // 4. Enviar para Fila
         messageBroker.sendToProcessQueue(savedVideo);
