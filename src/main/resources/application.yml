@@ -11,10 +11,12 @@ spring:
     hibernate:
       ddl-auto: update
   rabbitmq:
-    host: ${RABBIT_HOST:rabbitmq.hackathon-mq.svc.cluster.local}
-    port: 5672
-    username: ${RABBIT_USER:admin}
+    host: ${RABBIT_HOST:localhost}
+    port: ${RABBIT_PORT:5671}
+    username: ${RABBIT_USER:appuser}
     password: ${RABBIT_PASSWORD:admin123}
+    ssl:
+      enabled: true
 
 server:
   port: 8082

@@ -60,6 +60,7 @@ jobs:
     needs: sonar_analyse
     outputs:
       tag: ${{ steps.build-image.outputs.tag }}
+      full_image: ${{ steps.build-image.outputs.full_image }}
     
     steps:
 
@@ -114,6 +115,7 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           echo "tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+          echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
   Deploy-to-EKS:
     runs-on: ubuntu-latest
     needs: build
@@ -151,10 +153,10 @@ jobs:
 
       - name: Atualizar manifesto do Kubernetes com a nova imagem
         env:
-          NEW_TAG: ${{ needs.build.outputs.tag }}
+          FULL_IMAGE: ${{ needs.build.outputs.full_image }}
         run: |
          
-          sed -i "s/TAG/$NEW_TAG/g" k8s/deployment.yaml
+          sed -i "s|DOCKER_IMAGE_PLACEHOLDER|$FULL_IMAGE|g" k8s/deployment.yaml
 
       - name: Verificar valor da variavel imagem 
         run: |
