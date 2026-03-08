@@ -50,6 +50,7 @@ jobs:
             -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.organization=hackathom-fiap \
             -Dsonar.projectKey=hackathom-fiap_fiapx-app-api \
+            -Dsonar.branch.name=main \
             -Dsonar.host.url=https://sonarcloud.io
 
 
