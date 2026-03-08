@@ -47,7 +47,7 @@ public class VideoPersistenceAdapter implements VideoRepository {
                 .collect(Collectors.toList());
     }
 
-    private Video mapToDomain(VideoEntity entity) {
+    Video mapToDomain(VideoEntity entity) {
         return Video.builder()
                 .id(entity.getId())
                 .title(entity.getTitle())
