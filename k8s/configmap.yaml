@@ -4,7 +4,14 @@ metadata:
   name: video-api-config
   namespace: hackathon-video-api
 data:
-  DB_HOST: "postgres-postgresql.hackathon-db.svc.cluster.local"
-  DB_USER: "admin"
-  RABBIT_HOST: "rabbitmq.hackathon-mq.svc.cluster.local"
+  DB_HOST: "soat-postgres-db.cszqygoyua1z.us-east-1.rds.amazonaws.com"
+  DB_USER: "postgresadmin"
+  DB_NAME: "api-db"
+  # RabbitMQ (Amazon MQ)
+  RABBIT_HOST: "b-da09d5c8-d2e5-41de-a71b-c14c7cb234db.mq.us-east-1.on.aws"
+  RABBIT_PORT: "5671"
   RABBIT_USER: "admin"
+  RABBIT_SSL: "true"
+  # S3 Configuration
+  S3_BUCKET_NAME: "fiapx-hackathon-videos" # Verifique se este é o nome real do seu bucket
+  AWS_REGION: "us-east-1"
