@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST:postgres-video-postgresql.hackathon-db.svc.cluster.local}:5432/video_db
-    username: ${DB_USER:video_admin}
-    password: ${DB_PASSWORD:video_password123}
+    url: jdbc:postgresql://${DB_HOST}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
   servlet:
     multipart:
       max-file-size: 100MB
