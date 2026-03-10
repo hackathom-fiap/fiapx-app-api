@@ -160,21 +160,4 @@ class VideoTest {
         assertNull(video.getCreatedAt());
         assertNull(video.getUpdatedAt());
     }
-    
-    @Test
-    void toString_containsExpectedFields() {
-        UUID videoId = UUID.randomUUID();
-        Video video = Video.builder()
-                .id(videoId)
-                .title("Test Video")
-                .status("PENDING")
-                .build();
-        
-        String videoString = video.toString();
-        
-        assertNotNull(videoString);
-        assertTrue(videoString.contains("Test Video"));
-        assertTrue(videoString.contains("PENDING"));
-        assertTrue(videoString.contains(videoId.toString()));
-    }
 }

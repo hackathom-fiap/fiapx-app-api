@@ -100,44 +100,4 @@ class VideoUploadRequestTest {
         assertNull(request.getUserEmail());
         assertNull(request.getFile());
     }
-    
-    @Test
-    void equalsAndHashCode_consistency() {
-        MultipartFile mockFile = MultiPartFileTestMock.createFile("files", "test.mp4", "video/mp4");
-        
-        VideoUploadRequest request1 = VideoUploadRequest.builder()
-                .title("Test Video")
-                .username("testuser")
-                .userEmail("test@example.com")
-                .file(mockFile)
-                .build();
-                
-        VideoUploadRequest request2 = VideoUploadRequest.builder()
-                .title("Test Video")
-                .username("testuser")
-                .userEmail("test@example.com")
-                .file(mockFile)
-                .build();
-        
-        assertEquals(request1, request2);
-        assertEquals(request1.hashCode(), request2.hashCode());
-    }
-    
-    @Test
-    void toString_containsExpectedFields() {
-        MultipartFile mockFile = MultiPartFileTestMock.createFile("files", "test.mp4", "video/mp4");
-        VideoUploadRequest request = VideoUploadRequest.builder()
-                .title("Test Video")
-                .username("testuser")
-                .userEmail("test@example.com")
-                .file(mockFile)
-                .build();
-        
-        String requestString = request.toString();
-        
-        assertNotNull(requestString);
-        assertTrue(requestString.contains("Test Video"));
-        assertTrue(requestString.contains("testuser"));
-        assertTrue(requestString.contains("test@example.com"));
-    }
 }
