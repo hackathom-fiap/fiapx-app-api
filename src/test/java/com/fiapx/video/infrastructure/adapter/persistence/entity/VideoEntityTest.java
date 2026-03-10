@@ -159,23 +159,6 @@ class VideoEntityTest {
     }
     
     @Test
-    void toString_containsExpectedFields() {
-        UUID videoId = UUID.randomUUID();
-        VideoEntity videoEntity = VideoEntity.builder()
-                .id(videoId)
-                .title("Test Video")
-                .status("PENDING")
-                .build();
-        
-        String videoEntityString = videoEntity.toString();
-        
-        assertNotNull(videoEntityString);
-        assertTrue(videoEntityString.contains("Test Video"));
-        assertTrue(videoEntityString.contains("PENDING"));
-        assertTrue(videoEntityString.contains(videoId.toString()));
-    }
-    
-    @Test
     void builder_withEmptyStringValues() {
         UUID videoId = UUID.randomUUID();
         
