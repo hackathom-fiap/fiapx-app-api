@@ -133,5 +133,3 @@ class UploadVideoUseCaseTest {
         verify(s3Uploader).uploadFile(eq(BUCKET_NAME), anyString(), eq(mockFile));
     }
 }
-
-}
