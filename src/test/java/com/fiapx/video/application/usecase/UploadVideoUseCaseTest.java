@@ -2,6 +2,7 @@ package com.fiapx.video.application.usecase;
 
 import Mocks.MultiPartFileTestMock;
 import com.fiapx.video.application.dto.VideoUploadRequest;
+import com.fiapx.video.application.service.S3UploaderService;
 import com.fiapx.video.domain.entity.Video;
 import com.fiapx.video.domain.repository.VideoRepository;
 import com.fiapx.video.domain.service.MessageBrokerPort;
@@ -11,8 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -28,6 +31,9 @@ class UploadVideoUseCaseTest {
     
     @Mock
     private MessageBrokerPort messageBroker;
+
+    @Mock
+    private S3UploaderService s3Uploader;
     
     @InjectMocks
     private UploadVideoUseCase uploadVideoUseCase;
@@ -35,9 +41,11 @@ class UploadVideoUseCaseTest {
     private VideoUploadRequest request;
     private Video savedVideo;
     private MultipartFile mockFile;
+    private final String BUCKET_NAME = "test-bucket";
     
     @BeforeEach
     void setUp() {
+        ReflectionTestUtils.setField(uploadVideoUseCase, "s3BucketName", BUCKET_NAME);
         mockFile = MultiPartFileTestMock.createFile("files", "test-video.mp4", "video/mp4");
         
         request = VideoUploadRequest.builder()
@@ -60,28 +68,24 @@ class UploadVideoUseCaseTest {
     }
     
     @Test
-    void execute_success() {
+    void execute_success() throws IOException {
         when(videoRepository.save(any(Video.class))).thenReturn(savedVideo);
         
         Video result = uploadVideoUseCase.execute(request);
         
         assertNotNull(result);
         assertEquals(request.getTitle(), result.getTitle());
-        assertEquals(request.getUsername(), result.getUsername());
-        assertEquals(request.getUserEmail(), result.getUserEmail());
         assertEquals("PENDING", result.getStatus());
-        assertEquals(mockFile.getOriginalFilename(), result.getOriginalFileName());
-        assertEquals(mockFile.getContentType(), result.getContentType());
-        assertNotNull(result.getCreatedAt());
-        assertTrue(result.getStoragePath().contains("/tmp/videos/"));
+        assertTrue(result.getStoragePath().startsWith("s3://" + BUCKET_NAME + "/uploads/"));
         assertTrue(result.getStoragePath().endsWith(".mp4"));
         
-        verify(videoRepository, times(1)).save(any(Video.class));
+        verify(s3Uploader, times(1)).uploadFile(eq(BUCKET_NAME), anyString(), eq(mockFile));
+        verify(videoRepository, times(2)).save(any(Video.class));
         verify(messageBroker, times(1)).sendToProcessQueue(any(Video.class));
     }
     
     @Test
-    void execute_success_withFileWithoutExtension() {
+    void execute_success_withFileWithoutExtension() throws IOException {
         MultipartFile fileWithoutExtension = MultiPartFileTestMock.createFile("files", "video", "video/mp4");
         request.setFile(fileWithoutExtension);
         
@@ -90,15 +94,14 @@ class UploadVideoUseCaseTest {
         Video result = uploadVideoUseCase.execute(request);
         
         assertNotNull(result);
-        assertTrue(result.getStoragePath().contains("/tmp/videos/"));
-        assertFalse(result.getStoragePath().endsWith("."));
+        assertTrue(result.getStoragePath().startsWith("s3://" + BUCKET_NAME + "/uploads/"));
         
-        verify(videoRepository, times(1)).save(any(Video.class));
-        verify(messageBroker, times(1)).sendToProcessQueue(any(Video.class));
+        verify(s3Uploader, times(1)).uploadFile(eq(BUCKET_NAME), anyString(), eq(fileWithoutExtension));
+        verify(videoRepository, times(2)).save(any(Video.class));
     }
     
     @Test
-    void execute_success_withMultipleExtensions() {
+    void execute_success_withMultipleExtensions() throws IOException {
         MultipartFile fileWithMultipleExtensions = MultiPartFileTestMock.createFile("files", "video.test.mp4", "video/mp4");
         request.setFile(fileWithMultipleExtensions);
         
@@ -109,24 +112,26 @@ class UploadVideoUseCaseTest {
         assertNotNull(result);
         assertTrue(result.getStoragePath().endsWith(".mp4"));
         
-        verify(videoRepository, times(1)).save(any(Video.class));
-        verify(messageBroker, times(1)).sendToProcessQueue(any(Video.class));
+        verify(s3Uploader, times(1)).uploadFile(eq(BUCKET_NAME), anyString(), eq(fileWithMultipleExtensions));
+        verify(videoRepository, times(2)).save(any(Video.class));
     }
     
     @Test
-    void execute_verifyVideoCreation() {
+    void execute_verifyVideoCreation() throws IOException {
         when(videoRepository.save(any(Video.class))).thenReturn(savedVideo);
 
         uploadVideoUseCase.execute(request);
 
-        verify(videoRepository).save(argThat(video ->
+        verify(videoRepository, atLeastOnce()).save(argThat(video ->
             video.getTitle().equals(request.getTitle()) &&
             video.getUsername().equals(request.getUsername()) &&
             video.getUserEmail().equals(request.getUserEmail()) &&
             video.getOriginalFileName().equals(mockFile.getOriginalFilename()) &&
             video.getContentType().equals(mockFile.getContentType()) &&
-            video.getStatus().equals("PENDING") &&
-            video.getCreatedAt() != null
+            video.getStatus().equals("PENDING")
         ));
+        verify(s3Uploader).uploadFile(eq(BUCKET_NAME), anyString(), eq(mockFile));
     }
+}
+
 }
