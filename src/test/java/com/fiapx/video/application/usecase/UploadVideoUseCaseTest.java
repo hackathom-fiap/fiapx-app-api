@@ -115,6 +115,24 @@ class UploadVideoUseCaseTest {
         verify(s3Uploader, times(1)).uploadFile(eq(BUCKET_NAME), anyString(), eq(fileWithMultipleExtensions));
         verify(videoRepository, times(2)).save(any(Video.class));
     }
+
+    @Test
+    void execute_success_withNullFileName() throws IOException {
+        MultipartFile fileWithNullName = MultiPartFileTestMock.createFile("files", null, "video/mp4");
+        request.setFile(fileWithNullName);
+        
+        when(videoRepository.save(any(Video.class))).thenReturn(savedVideo);
+        
+        Video result = uploadVideoUseCase.execute(request);
+        
+        assertNotNull(result);
+        assertTrue(result.getStoragePath().startsWith("s3://" + BUCKET_NAME + "/uploads/"));
+        // Se fileName for null, a extensão deve ser vazia, então o path não deve terminar com "." ou ".mp4"
+        assertFalse(result.getStoragePath().endsWith("."));
+        
+        verify(s3Uploader, times(1)).uploadFile(eq(BUCKET_NAME), anyString(), eq(fileWithNullName));
+        verify(videoRepository, times(2)).save(any(Video.class));
+    }
     
     @Test
     void execute_verifyVideoCreation() throws IOException {

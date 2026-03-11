@@ -175,6 +175,28 @@ class VideoControllerTest {
     }
 
     @Test
+    void upload_success_withMapWithoutEmail() {
+        String username = "testuser";
+        String title = "Test Video";
+        MultipartFile[] singleFile = new MultipartFile[]{mockFiles[0]};
+        
+        try (MockedStatic<SecurityContextHolder> mockedSecurity = mockStatic(SecurityContextHolder.class)) {
+            mockedSecurity.when(SecurityContextHolder::getContext).thenReturn(securityContext);
+            when(securityContext.getAuthentication()).thenReturn(authentication);
+            when(authentication.getName()).thenReturn(username);
+            when(authentication.getDetails()).thenReturn(Map.of("other-key", "other-value")); // Map without email
+            
+            when(uploadVideoUseCase.execute(any())).thenReturn(mockVideo);
+            
+            List<Video> result = videoController.upload(singleFile, title);
+            
+            assertNotNull(result);
+            assertEquals(1, result.size());
+            verify(uploadVideoUseCase, times(1)).execute(any());
+        }
+    }
+
+    @Test
     void updateStatus_success() {
         UUID videoId = UUID.randomUUID();
         VideoStatusUpdateRequest request = VideoStatusUpdateRequest.builder()
