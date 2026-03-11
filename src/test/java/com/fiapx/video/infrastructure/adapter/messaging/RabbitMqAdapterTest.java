@@ -8,10 +8,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -38,11 +40,12 @@ class RabbitMqAdapterTest {
         verify(rabbitTemplate, times(1)).convertAndSend(
                 eq("video-process-exchange"),
                 eq("video.upload.event"),
-                any(java.util.Map.class)
+                any(Map.class)
         );
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void shouldSendToProcessQueueWithNullFields() {
         Video video = Video.builder()
                 .id(UUID.randomUUID())
@@ -56,11 +59,12 @@ class RabbitMqAdapterTest {
         verify(rabbitTemplate, times(1)).convertAndSend(
                 eq("video-process-exchange"),
                 eq("video.upload.event"),
-                argThat(map -> 
-                    map.get("storagePath").equals("") &&
-                    map.get("userEmail").equals("") &&
-                    map.get("contentType").equals("")
-                )
+                argThat(argument -> {
+                    Map<String, String> map = (Map<String, String>) argument;
+                    return "".equals(map.get("storagePath")) &&
+                           "".equals(map.get("userEmail")) &&
+                           "".equals(map.get("contentType"));
+                })
         );
     }
 }
