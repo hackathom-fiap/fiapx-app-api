@@ -41,4 +41,26 @@ class RabbitMqAdapterTest {
                 any(java.util.Map.class)
         );
     }
+
+    @Test
+    void shouldSendToProcessQueueWithNullFields() {
+        Video video = Video.builder()
+                .id(UUID.randomUUID())
+                .storagePath(null)
+                .userEmail(null)
+                .contentType(null)
+                .build();
+
+        rabbitMqAdapter.sendToProcessQueue(video);
+
+        verify(rabbitTemplate, times(1)).convertAndSend(
+                eq("video-process-exchange"),
+                eq("video.upload.event"),
+                argThat(map -> 
+                    map.get("storagePath").equals("") &&
+                    map.get("userEmail").equals("") &&
+                    map.get("contentType").equals("")
+                )
+        );
+    }
 }
