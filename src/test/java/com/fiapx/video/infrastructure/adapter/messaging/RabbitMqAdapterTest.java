@@ -59,7 +59,7 @@ class RabbitMqAdapterTest {
         verify(rabbitTemplate, times(1)).convertAndSend(
                 eq("video-process-exchange"),
                 eq("video.upload.event"),
-                argThat(argument -> {
+                (Object) argThat(argument -> {
                     Map<String, String> map = (Map<String, String>) argument;
                     return "".equals(map.get("storagePath")) &&
                            "".equals(map.get("userEmail")) &&
