@@ -60,7 +60,6 @@ jobs:
     needs: sonar_analyse
     outputs:
       tag: ${{ steps.build-image.outputs.tag }}
-      full_image: ${{ steps.build-image.outputs.full_image }}
     
     steps:
 
@@ -70,9 +69,7 @@ jobs:
       - name: Configurar credenciais da AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          #role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_ARN }}
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          #role-to-assume: arn:aws:iam::239409137076:role/role-eks-fiap
           aws-region: ${{ secrets.AWS_REGION }}
 
 
@@ -155,12 +152,11 @@ jobs:
 
       - name: Atualizar manifesto do Kubernetes com a nova imagem
         env:
-          FULL_IMAGE: ${{ needs.build.outputs.full_image }}
+          NEW_TAG: ${{ needs.build.outputs.tag }}
         run: |
-         
-          sed -i "s|DOCKER_IMAGE_PLACEHOLDER|$FULL_IMAGE|g" k8s/deployment.yaml
 
-      - name: Verificar valor da variavel imagem 
+          sed -i "s/TAG/$NEW_TAG/g" k8s/deployment.yaml
+      - name: Verificar valor da variavel imagem
         run: |
           echo ${{ needs.build.outputs.tag }}
 
