@@ -13,5 +13,5 @@ data:
   RABBIT_USER: "appuser"
   RABBIT_SSL: "true"
   # S3 Configuration
-  S3_BUCKET_NAME: "fiapx-hackathon-videos" # Verifique se este é o nome real do seu bucket
+  S3_BUCKET_NAME: "fiapx-video" # Verifique se este é o nome real do seu bucket
   AWS_REGION: "us-east-1"

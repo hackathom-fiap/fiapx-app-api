@@ -132,4 +132,17 @@ class UploadVideoUseCaseTest {
         ));
         verify(s3Uploader).uploadFile(eq(BUCKET_NAME), anyString(), eq(mockFile));
     }
+
+    @Test
+    void execute_uploadFailure_shouldThrowException() throws IOException {
+        when(videoRepository.save(any(Video.class))).thenReturn(savedVideo);
+        doThrow(new IOException("S3 Error")).when(s3Uploader).uploadFile(anyString(), anyString(), any());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            uploadVideoUseCase.execute(request);
+        });
+
+        assertEquals("Erro ao fazer upload do vídeo para o S3", exception.getMessage());
+        verify(messageBroker, never()).sendToProcessQueue(any());
+    }
 }
