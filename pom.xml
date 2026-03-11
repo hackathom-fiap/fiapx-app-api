@@ -114,7 +114,10 @@
                         <exclude>com/fiapx/video/infrastructure/config/**</exclude>
                         <exclude>com/fiapx/video/application/dto/**</exclude>
                         <exclude>com/fiapx/video/infrastructure/adapter/persistence/entity/**</exclude>
+                        <exclude>com/fiapx/video/infrastructure/adapter/persistence/repository/**</exclude>
                         <exclude>com/fiapx/video/infrastructure/adapter/web/dto/**</exclude>
+                        <exclude>com/fiapx/video/domain/repository/**</exclude>
+                        <exclude>com/fiapx/video/domain/service/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
