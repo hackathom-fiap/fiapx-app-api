@@ -99,6 +99,15 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.11</version>
+                <configuration>
+                    <excludes>
+                        <exclude>com/fiapx/video/VideoApiApplication.class</exclude>
+                        <exclude>com/fiapx/video/infrastructure/config/**</exclude>
+                        <exclude>com/fiapx/video/application/dto/**</exclude>
+                        <exclude>com/fiapx/video/infrastructure/adapter/persistence/entity/**</exclude>
+                        <exclude>com/fiapx/video/infrastructure/adapter/web/dto/**</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -106,7 +115,6 @@
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-
                     <execution>
                         <id>report</id>
                         <phase>verify</phase>
