@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: video-api-ingress
+  namespace: hackathon-video-api
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m" # Aumenta o limite para upload de vídeos
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api/videos
+        pathType: Prefix
+        backend:
+          service:
+            name: video-api
+            port:
+              number: 8082
