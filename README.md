@@ -58,6 +58,7 @@ O sistema foi concebido como uma plataforma de Processamento Distribuido de Vide
 *   [Infra Database (PostgreSQL)](https://github.com/hackathom-fiap/fiapx-infra-postgres)
 *   [Infra Redis](https://github.com/hackathom-fiap/fiapx-infra-redis)
 *   [Infra IAM Roles](https://github.com/hackathom-fiap/fiapx-infra-roles)
+*   [Infra GTW](https://github.com/hackathom-fiap/fiapx-infra-gtw)
 
 ### Microserviços (APIs)
 *   [App Auth](https://github.com/hackathom-fiap/fiapx-app-auth)
